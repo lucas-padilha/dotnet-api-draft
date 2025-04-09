@@ -28,7 +28,7 @@ namespace Draft.Controllers
         }
 
         [HttpGet]
-        [Route("/{id}")]
+        [Route("{id}")]
         public ActionResult getFilmeById(Guid id)
         {
             var filmeEncontrado = filmes.Find(x => x.Id == id);
@@ -57,7 +57,7 @@ namespace Draft.Controllers
         }
 
         [HttpDelete]
-        [Route("/{id}")]
+        [Route("{id}")]
         public ActionResult DeleteFilme(Guid id)
         {
             var filmeEncontrado = filmes.Find(x => x.Id == id);
