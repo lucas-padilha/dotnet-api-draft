@@ -26,6 +26,12 @@ namespace Draft.Controllers
 
         private static List<Filme> filmes = new List<Filme>();
 
+/// <summary>
+/// Adiciona um novo filme ao banco de dados.
+/// Recebe um objeto CreateFilmeVM com os dados do filme a ser adicionado.
+/// </summary>
+/// <param name="filmeVM"></param>
+/// <returns>Retorna 201 para o cadastro feito com sucesso</returns>
         [HttpPost]
         public IActionResult AddFilme([FromBody] CreateFilmeVM filmeVM)
         {
@@ -38,6 +44,13 @@ namespace Draft.Controllers
 
         }
 
+/// <summary>
+/// Retorna todos os filmes cadastrados no banco de dados.
+/// Recebe dois parâmetros: PageNumber e SizePage para paginação dos resultados.
+/// </summary>
+/// <param name="PageNumber"></param>
+/// <param name="SizePage"></param>
+/// <returns>Status Code 200</returns>
         [HttpGet]
         public async Task<ActionResult> GetAllFilmes(int PageNumber = 0, int SizePage = 50)
         {
@@ -47,9 +60,7 @@ namespace Draft.Controllers
                 searchFilmeVm.PageNumber = PageNumber;
                 searchFilmeVm.SizePage = SizePage;
                 searchFilmeVm.TotalItens = await _context.Filmes.CountAsync(); // Conta o total de filmes no banco de dados
-                
 
-                //_context.Filmes.Skip(PageNumber * SizePage).Take(SizePage).ForEachAsync(x =>
                 await _context.Filmes.Skip(PageNumber * SizePage).Take(SizePage).ForEachAsync(async x =>
                 {
                      searchFilmeVm.dicCreatedFilmesVM.Add(x.Id, _mapper.Map<CreateFilmeVM>(x));
@@ -64,6 +75,12 @@ namespace Draft.Controllers
             }
         }
 
+/// <summary>
+/// Retorna um filme específico com base no ID fornecido.
+/// Recebe um parâmetro id do tipo Guid que representa o ID do filme a ser buscado.
+/// </summary>
+/// <param name="id"></param>
+/// <returns>Retorna Status Code 200</returns>
         [HttpGet]
         [Route("{id}")]
         public ActionResult GetFilmeById(Guid id)
@@ -77,6 +94,12 @@ namespace Draft.Controllers
             return Ok(_mapper.Map<CreateFilmeVM>(filmeEncontrado));
         }
 
+/// <summary>
+/// Atualiza um filme existente no banco de dados.
+/// </summary>
+/// <param name="id">Id do filme</param>
+/// <param name="filmeVM">Dados para atualizar</param>
+/// <returns></returns>
         [HttpPut]
         [Route("{id}")]
         public ActionResult UpdateFilme(Guid id, [FromBody] CreateFilmeVM filmeVM)
@@ -96,6 +119,12 @@ namespace Draft.Controllers
             return NoContent();
         }
 
+/// <summary>
+/// Remove um filme do banco de dados com base no ID fornecido.
+/// Recebe um parâmetro id do tipo Guid que representa o ID do filme a ser removido.
+/// </summary>
+/// <param name="id">Id do filme a ser deletado</param>
+/// <returns>Retorna 204</returns>
         [HttpDelete]
         [Route("{id}")]
         public ActionResult DeleteFilme(Guid id)
@@ -108,7 +137,7 @@ namespace Draft.Controllers
 
             _context.Filmes.Remove(filmeEncontrado);
             _context.SaveChanges(); // Salva as alterações no banco de dados
-            return Ok("Filme removido com sucesso.");
+            return NoContent();
         }
     }
 }
