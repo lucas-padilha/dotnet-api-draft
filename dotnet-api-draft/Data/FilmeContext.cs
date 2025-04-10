@@ -1,7 +1,7 @@
 ﻿using Draft.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace dotnet_api_draft;
+namespace dotnet_api_draft.Data;
 
 public class FilmeContext :DbContext
 {
