@@ -10,5 +10,7 @@ public class FilmeProfile : AutoMapper.Profile
     public FilmeProfile()
     {
         CreateMap<CreateFilmeVM, Filme>();    
+        CreateMap<Filme, CreateFilmeVM>();    
+        // CreateMap<Filme, SearchFilmeVm
     }    
 }
