@@ -1,6 +1,6 @@
 **Draft API**
 
-Project dedicaded to pratice the development of a API in .NET 6 with minimum API, few validations and integrations. 
+Project dedicaded to pratice the development of a API in .NET 8 with minimum API, few validations and integrations. 
 
 **Target**
 
