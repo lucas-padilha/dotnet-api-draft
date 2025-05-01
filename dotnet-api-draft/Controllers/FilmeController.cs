@@ -10,14 +10,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Draft.Controllers
 {
+    /// <summary>
+    /// Controlador responsável por gerenciar as operações relacionadas a filmes.
+    /// Permite adicionar, atualizar, remover e buscar filmes no banco de dados.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
-
     public class FilmeController : ControllerBase
     {
         private FilmeContext _context;
         private IMapper _mapper;
+        /// <summary>
+        /// Construtor da classe FilmeController.
+        /// /// Recebe o contexto do banco de dados e o mapeador AutoMapper como dependências.
+        /// O contexto é usado para interagir com o banco de dados e o mapeador é usado para converter entre modelos e ViewModels.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="mapper"></param>
         public FilmeController(FilmeContext context, IMapper mapper)
         {
             _mapper = mapper;
@@ -26,7 +36,7 @@ namespace Draft.Controllers
 
         private static List<Filme> filmes = new List<Filme>();
 
-/// <summary>
+        /// <summary>
 /// Adiciona um novo filme ao banco de dados.
 /// Recebe um objeto CreateFilmeVM com os dados do filme a ser adicionado.
 /// </summary>
@@ -44,7 +54,7 @@ namespace Draft.Controllers
 
         }
 
-/// <summary>
+        /// <summary>
 /// Retorna todos os filmes cadastrados no banco de dados.
 /// Recebe dois parâmetros: PageNumber e SizePage para paginação dos resultados.
 /// </summary>
@@ -75,7 +85,7 @@ namespace Draft.Controllers
             }
         }
 
-/// <summary>
+        /// <summary>
 /// Retorna um filme específico com base no ID fornecido.
 /// Recebe um parâmetro id do tipo Guid que representa o ID do filme a ser buscado.
 /// </summary>
@@ -94,7 +104,7 @@ namespace Draft.Controllers
             return Ok(_mapper.Map<CreateFilmeVM>(filmeEncontrado));
         }
 
-/// <summary>
+        /// <summary>
 /// Atualiza um filme existente no banco de dados.
 /// </summary>
 /// <param name="id">Id do filme</param>
@@ -112,19 +122,18 @@ namespace Draft.Controllers
             }
 
             _mapper.Map(filmeVM, filmeEncontrado); // Atualiza o filme encontrado com os dados do ViewModel           
-
-            //_context.Filmes.Update(filmeEncontrado);
+            
             _context.SaveChanges();
 
             return NoContent();
         }
 
-/// <summary>
-/// Remove um filme do banco de dados com base no ID fornecido.
-/// Recebe um parâmetro id do tipo Guid que representa o ID do filme a ser removido.
-/// </summary>
-/// <param name="id">Id do filme a ser deletado</param>
-/// <returns>Retorna 204</returns>
+        /// <summary>
+        /// Remove um filme do banco de dados com base no ID fornecido.
+        /// Recebe um parâmetro id do tipo Guid que representa o ID do filme a ser removido.
+        /// </summary>
+        /// <param name="id">Id do filme a ser deletado</param>
+        /// <returns>Retorna 204</returns>
         [HttpDelete]
         [Route("{id}")]
         public ActionResult DeleteFilme(Guid id)
@@ -137,7 +146,7 @@ namespace Draft.Controllers
 
             _context.Filmes.Remove(filmeEncontrado);
             _context.SaveChanges(); // Salva as alterações no banco de dados
-            return NoContent();
+            return NoContent(); // Retorna 204 No Content para indicar que a operação foi bem-sucedida
         }
     }
 }
