@@ -1,6 +1,7 @@
 
 using System.Reflection;
-using dotnet_api_draft.Data;
+using DraftDomain.IRepository;
+using Draft.IOC;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,9 +29,8 @@ builder.Services.AddCors(options =>
             .WithExposedHeaders("X-Pagination"));
 });
 
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddDbContext<FilmeContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+// builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddInfraestructureService(builder.Configuration);
 
 var app = builder.Build();
 

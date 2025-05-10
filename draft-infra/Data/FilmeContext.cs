@@ -1,9 +1,10 @@
-﻿using Draft.Model;
+﻿
+using DraftDomain.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace dotnet_api_draft.Data;
+namespace DraftInfra.Data;
 
-public class FilmeContext :DbContext
+public class FilmeContext : DbContext
 {
     public FilmeContext(DbContextOptions<FilmeContext> options) : base(options)
     {

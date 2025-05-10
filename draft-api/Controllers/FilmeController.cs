@@ -1,11 +1,9 @@
 using System.Threading.Tasks;
 using AutoMapper;
-using dotnet_api_draft;
-using dotnet_api_draft.Data;
-using dotnet_api_draft.ViewModel;
-using Draft.Model;
+using DraftApi.ViewModel;
+using DraftDomain.IRepository;
+using DraftDomain.Model;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 
 namespace Draft.Controllers
@@ -19,22 +17,25 @@ namespace Draft.Controllers
     [Produces("application/json")]
     public class FilmeController : ControllerBase
     {
-        private FilmeContext _context;
         private IMapper _mapper;
+        private IFilmeRepository _filmeRepository;
+
         /// <summary>
         /// Construtor da classe FilmeController.
         /// /// Recebe o contexto do banco de dados e o mapeador AutoMapper como dependências.
         /// O contexto é usado para interagir com o banco de dados e o mapeador é usado para converter entre modelos e ViewModels.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="mapper"></param>
-        public FilmeController(FilmeContext context, IMapper mapper)
+        /// <param name="filmeRepository">Repositório de filmes usado para acessar os dados do banco de dados.</param>
+        public FilmeController(IFilmeRepository filmeRepository)
         {
-            _mapper = mapper;
-            _context = context;
+            _filmeRepository = filmeRepository;
+            //_context = context;
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Filme, CreateFilmeVM>().ReverseMap(); // Mapeia entre o modelo Filme e o ViewModel CreateFilmeVM
+            });
+            _mapper = config.CreateMapper(); // Cria uma instância do mapeador AutoMapper
         }
-
-        private static List<Filme> filmes = new List<Filme>();
 
         /// <summary>
 /// Adiciona um novo filme ao banco de dados.
@@ -47,11 +48,9 @@ namespace Draft.Controllers
         {
             var filme = _mapper.Map<Filme>(filmeVM); // Converte o ViewModel para o modelo Filme usando AutoMapper
             filme.Id = Guid.NewGuid(); // Gera um novo ID para o filme
-            _context.Filmes.Add(filme); // Adiciona o filme ao contexto do banco de dados
-            _context.SaveChanges(); // Salva as alterações no banco de dados
+            _filmeRepository.AddAsync(filme); // Adiciona o filme ao contexto do banco de dados            
 
             return CreatedAtAction(nameof(GetFilmeById), new { id = filme.Id }, filme); // Retorna o filme criado com o ID gerado
-
         }
 
         /// <summary>
@@ -69,12 +68,14 @@ namespace Draft.Controllers
                 var searchFilmeVm = new SearchFilmeVM();
                 searchFilmeVm.PageNumber = PageNumber;
                 searchFilmeVm.SizePage = SizePage;
-                searchFilmeVm.TotalItens = await _context.Filmes.CountAsync(); // Conta o total de filmes no banco de dados
+                searchFilmeVm.TotalItens = await _filmeRepository.GetCountAsync();
+                
+                var filmes = await _filmeRepository.GetAllAsync(); // Obtém todos os filmes do repositório  
 
-                await _context.Filmes.Skip(PageNumber * SizePage).Take(SizePage).ForEachAsync(async x =>
+                foreach (var filme in filmes.Skip(PageNumber * SizePage).Take(SizePage))
                 {
-                     searchFilmeVm.dicCreatedFilmesVM.Add(x.Id, _mapper.Map<CreateFilmeVM>(x));
-                });                
+                    searchFilmeVm.dicCreatedFilmesVM.Add(filme.Id, _mapper.Map<CreateFilmeVM>(filme)); 
+                }
 
                 return Ok(searchFilmeVm);
             }
@@ -95,7 +96,7 @@ namespace Draft.Controllers
         [Route("{id}")]
         public ActionResult GetFilmeById(Guid id)
         {
-            var filmeEncontrado = _context.Filmes.FirstOrDefault(x => x.Id == id);
+            var filmeEncontrado = _filmeRepository.GetByIdAsync(id);
             if (filmeEncontrado == null)
             {
                 return NotFound("Filme não encontrado.");
@@ -112,18 +113,15 @@ namespace Draft.Controllers
 /// <returns></returns>
         [HttpPut]
         [Route("{id}")]
-        public ActionResult UpdateFilme(Guid id, [FromBody] CreateFilmeVM filmeVM)
+        public async Task<ActionResult> UpdateFilme(Guid id, [FromBody] CreateFilmeVM filmeVM)
         {
-            var filmeEncontrado = _context.Filmes.FirstOrDefault(x => x.Id == id);
-
+            var filmeEncontrado = await _filmeRepository.GetByIdAsync(id);
             if (filmeEncontrado == null)
             {
                 return NotFound("Filme não encontrado.");
             }
-
             _mapper.Map(filmeVM, filmeEncontrado); // Atualiza o filme encontrado com os dados do ViewModel           
-            
-            _context.SaveChanges();
+            await _filmeRepository.UpdateAsync(filmeEncontrado);            
 
             return NoContent();
         }
@@ -136,16 +134,15 @@ namespace Draft.Controllers
         /// <returns>Retorna 204</returns>
         [HttpDelete]
         [Route("{id}")]
-        public ActionResult DeleteFilme(Guid id)
+        public async Task<ActionResult> DeleteFilme(Guid id)
         {
-            var filmeEncontrado = _context.Filmes.FirstOrDefault(x => x.Id == id);
+            var filmeEncontrado = _filmeRepository.GetByIdAsync(id);
             if (filmeEncontrado == null)
             {
                 return NotFound("Filme não encontrado.");
             }
 
-            _context.Filmes.Remove(filmeEncontrado);
-            _context.SaveChanges(); // Salva as alterações no banco de dados
+            await _filmeRepository.DeleteAsync(id);
             return NoContent(); // Retorna 204 No Content para indicar que a operação foi bem-sucedida
         }
     }
