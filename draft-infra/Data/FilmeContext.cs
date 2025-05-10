@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DraftInfra.Data;
 
-public class FilmeContext :DbContext
+public class FilmeContext : DbContext
 {
     public FilmeContext(DbContextOptions<FilmeContext> options) : base(options)
     {

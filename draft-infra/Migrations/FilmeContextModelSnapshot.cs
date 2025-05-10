@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using dotnet_api_draft;
-using dotnet_api_draft.Data;
+using DraftInfra.Data;
 
 #nullable disable
 
