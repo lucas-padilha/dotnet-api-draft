@@ -5,8 +5,6 @@ using DraftInfra.Data;
 using DraftInfra.Repository;
 using Microsoft.EntityFrameworkCore;
 
-
-
 namespace Draft.IOC;
 
 public static class DependencyInjection
